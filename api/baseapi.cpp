@@ -1041,6 +1041,36 @@ static void AddBoxTohOCR(const PageIterator *it,
   hocr_str->add_str_int(" ", top);
   hocr_str->add_str_int(" ", right);
   hocr_str->add_str_int(" ", bottom);
+
+  // Add baseline information to hOCR
+  if (level == PageIteratorLevel::RIL_TEXTLINE) {
+    // get coordinates of the baseline
+    int x1, y1, x2, y2;
+    it->Baseline(level, &x1, &y1, &x2, &y2);
+
+    // get coefficients for the polynomial representation of the baseline
+    int p0;
+    float p1;
+    p0 = bottom - y1;
+    p1 = ((float) (y1 - y2)) / (x2 - x1);
+ 
+    // add coefficients to hOCR string
+    int f_size;
+    if (p1 > 0) f_size = 8;
+    else f_size = 9;
+    *hocr_str += "; baseline ";
+
+    // string for p1
+    char p1_str[9];
+    snprintf(p1_str, f_size - 1, "%f", p1);
+    p1_str[f_size - 1] = '\0';
+    *hocr_str += p1_str;
+
+    // p0 is an int and thus can be added like all other parameters
+    hocr_str->add_str_int(" ", p0);
+  }
+  // end of additional baseline information
+
   *hocr_str += "\">";
 }
 
