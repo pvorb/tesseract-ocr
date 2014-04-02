@@ -175,3 +175,5 @@ FakesAssemblies/
 
 # Tesseract specific
 *.tif
+
+vs2008/
